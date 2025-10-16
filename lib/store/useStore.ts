@@ -10,10 +10,6 @@ interface StoreState {
   logout: () => void;
   updateUserRole: (role: 'customer' | 'seller' | 'admin') => void;
 
-  // Theme
-  theme: 'light' | 'dark';
-  toggleTheme: () => void;
-
   // Cart
   cartItems: CartItem[];
   addToCart: (product: Product, quantity: number) => void;
@@ -25,75 +21,76 @@ interface StoreState {
 
 export const useStore = create<StoreState>()(
   persist(
-    (set, get) => ({
-      // Auth
-      user: null,
-      isAuthenticated: false,
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
-      logout: () => set({ user: null, isAuthenticated: false }),
-      updateUserRole: (role) =>
-        set((state) => ({
-          user: state.user ? { ...state.user, role } : null,
-        })),
+    (set, get) => (
+      {
+        // Auth
+        user: null,
+        isAuthenticated: false,
+        setUser: (user) => set({ user, isAuthenticated: !!user }),
+        logout: () => set({ user: null, isAuthenticated: false }),
+        updateUserRole: (role) =>
+          set((state) => (
+            {
+              user: state.user ? { ...state.user, role } : null,
+            }
+          )),
 
-      // Theme
-      theme: 'dark',
-      toggleTheme: () =>
-        set((state) => ({
-          theme: state.theme === 'dark' ? 'light' : 'dark',
-        })),
-
-      // Cart
-      cartItems: [],
-      addToCart: (product, quantity) =>
-        set((state) => {
-          const existingItem = state.cartItems.find(
-            (item) => item.product_id === product.id
-          );
-          if (existingItem) {
+        // Cart
+        cartItems: [],
+        addToCart: (product, quantity) =>
+          set((state) => {
+            const existingItem = state.cartItems.find(
+              (item) => item.product_id === product.id
+            );
+            if (existingItem) {
+              return {
+                cartItems: state.cartItems.map((item) =>
+                  item.product_id === product.id
+                    ? { ...item, quantity: item.quantity + quantity }
+                    : item
+                ),
+              };
+            }
             return {
-              cartItems: state.cartItems.map((item) =>
-                item.product_id === product.id
-                  ? { ...item, quantity: item.quantity + quantity }
-                  : item
-              ),
+              cartItems: [
+                ...state.cartItems,
+                {
+                  id: Date.now(),
+                  user_id: state.user?.id || 0,
+                  product_id: product.id,
+                  quantity,
+                  product,
+                },
+              ],
             };
-          }
-          return {
-            cartItems: [
-              ...state.cartItems,
-              {
-                id: Date.now(),
-                user_id: state.user?.id || 0,
-                product_id: product.id,
-                quantity,
-                product,
-              },
-            ],
-          };
-        }),
-      removeFromCart: (productId) =>
-        set((state) => ({
-          cartItems: state.cartItems.filter(
-            (item) => item.product_id !== productId
-          ),
-        })),
-      updateCartQuantity: (productId, quantity) =>
-        set((state) => ({
-          cartItems: state.cartItems.map((item) =>
-            item.product_id === productId ? { ...item, quantity } : item
-          ),
-        })),
-      clearCart: () => set({ cartItems: [] }),
-      getCartTotal: () => {
-        const state = get();
-        return state.cartItems.reduce(
-          (total, item) =>
-            total + (item.product?.price || 0) * item.quantity,
-          0
-        );
-      },
-    }),
+          }),
+        removeFromCart: (productId) =>
+          set((state) => (
+            {
+              cartItems: state.cartItems.filter(
+                (item) => item.product_id !== productId
+              ),
+            }
+          )),
+        updateCartQuantity: (productId, quantity) =>
+          set((state) => (
+            {
+              cartItems: state.cartItems.map((item) =>
+                item.product_id === productId ? { ...item, quantity } : item
+              ),
+            }
+          )),
+        clearCart: () => set({ cartItems: [] }),
+        getCartTotal: () => {
+          const state = get();
+          return state.cartItems.reduce(
+            (total, item) =>
+              total + (item.product?.price || 0) * item.quantity,
+            0
+          );
+        },
+      }
+    ),
     {
       name: 'local-connect-sa-store',
     }
