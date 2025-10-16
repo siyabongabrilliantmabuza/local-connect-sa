@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useStore } from '@/lib/store/useStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Menu, X, Moon, Sun, ShoppingCart, Heart, LogOut } from 'lucide-react';
+import { Menu, X, Moon, Sun, ShoppingCart, Heart, LogOut, Store } from 'lucide-react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,6 +36,11 @@ export default function Navbar() {
             <Link href="/contact" className="text-sm font-medium hover:text-fuchsia-600 transition">
               Contact
             </Link>
+            {user?.role === 'seller' && (
+              <Link href="/dashboard" className="text-sm font-medium hover:text-fuchsia-600 transition">
+                Dashboard
+              </Link>
+            )}
           </nav>
 
           {/* Right Section */}
@@ -83,7 +88,15 @@ export default function Navbar() {
             {/* Auth */}
             {user ? (
               <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">{user.full_name}</span>
+                <span className="text-sm font-medium hidden sm:inline">{user.full_name}</span>
+                {user.role !== 'seller' && (
+                  <Link href="/become-seller">
+                    <Button size="sm" variant="outline" className="flex items-center gap-2">
+                      <Store className="h-4 w-4" />
+                      <span className="hidden sm:inline">Sell</span>
+                    </Button>
+                  </Link>
+                )}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -135,6 +148,16 @@ export default function Navbar() {
             <Link href="/contact" className="block py-2 text-sm font-medium hover:text-fuchsia-600">
               Contact
             </Link>
+            {user?.role === 'seller' && (
+              <Link href="/dashboard" className="block py-2 text-sm font-medium hover:text-fuchsia-600">
+                Dashboard
+              </Link>
+            )}
+            {user && user.role !== 'seller' && (
+              <Link href="/become-seller" className="block py-2 text-sm font-medium hover:text-fuchsia-600">
+                Become a Seller
+              </Link>
+            )}
           </nav>
         )}
       </div>

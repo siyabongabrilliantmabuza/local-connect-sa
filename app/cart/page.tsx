@@ -129,9 +129,11 @@ export default function CartPage() {
               </div>
             </div>
 
-            <Button className="w-full bg-fuchsia-600 hover:bg-fuchsia-700 mb-3">
-              Proceed to Checkout
-            </Button>
+            <Link href="/checkout">
+              <Button className="w-full bg-fuchsia-600 hover:bg-fuchsia-700 mb-3">
+                Proceed to Checkout
+              </Button>
+            </Link>
             <Link href="/products">
               <Button variant="outline" className="w-full">
                 Continue Shopping

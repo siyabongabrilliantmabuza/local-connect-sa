@@ -8,6 +8,7 @@ interface StoreState {
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   logout: () => void;
+  updateUserRole: (role: 'customer' | 'seller' | 'admin') => void;
 
   // Theme
   theme: 'light' | 'dark';
@@ -30,6 +31,10 @@ export const useStore = create<StoreState>()(
       isAuthenticated: false,
       setUser: (user) => set({ user, isAuthenticated: !!user }),
       logout: () => set({ user: null, isAuthenticated: false }),
+      updateUserRole: (role) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, role } : null,
+        })),
 
       // Theme
       theme: 'dark',
